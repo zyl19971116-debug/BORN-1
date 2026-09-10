@@ -40,7 +40,7 @@ declare global {
 export default function Create() {
   const [name, setName] = useState("");
   const [ticker, setTicker] = useState("");
-  const [uri, setUri] = useState("");
+  const [imageData, setImageData] = useState("");
   const [website, setWebsite] = useState("");
   const [xUrl, setXUrl] = useState("");
   const [preview, setPreview] = useState("");
@@ -57,10 +57,19 @@ export default function Create() {
 
   function selectImage(file?: File) {
     if (!file) return;
+    if (file.size > 150_000) {
+      setStatus(
+        "Please choose an image smaller than 150 KB to keep the onchain launch fee reasonable."
+      );
+      return;
+    }
     if (preview) URL.revokeObjectURL(preview);
     setPreview(URL.createObjectURL(file));
+    const reader = new FileReader();
+    reader.onload = () => setImageData(String(reader.result));
+    reader.readAsDataURL(file);
     setStatus(
-      "Image selected. Upload it to IPFS and paste the metadata URI below before launching."
+      "Image selected. Token metadata will be generated automatically."
     );
   }
 
@@ -77,6 +86,7 @@ export default function Create() {
       return setStatus(
         "Install an EVM browser wallet such as MetaMask, then connect it."
       );
+    if (!imageData) return setStatus("Choose a token image before launching.");
     setBusy(true);
     setHash("");
     try {
@@ -108,11 +118,21 @@ export default function Create() {
         chain: robinhood,
         transport: custom(window.ethereum),
       });
+      const metadata = `data:application/json,${encodeURIComponent(
+        JSON.stringify({
+          name: name.trim(),
+          symbol: ticker.trim().toUpperCase(),
+          description: `${name.trim()} was launched permissionlessly on MEME//BORN.`,
+          image: imageData,
+          external_url: website.trim() || undefined,
+          twitter: xUrl.trim() || undefined,
+        })
+      )}`;
       const tx = await client.writeContract({
         address: factory,
         abi: factoryAbi,
         functionName: "createToken",
-        args: [name.trim(), ticker.trim().toUpperCase(), uri.trim()],
+        args: [name.trim(), ticker.trim().toUpperCase(), metadata],
       });
       setHash(tx);
       setStatus("Token creation submitted directly to Robinhood Chain.");
@@ -240,20 +260,6 @@ export default function Create() {
                 />
               </label>
             </div>
-            <label className="block text-xs font-bold text-white/55">
-              METADATA URI{" "}
-              <input
-                className="mt-2"
-                value={uri}
-                onChange={(e) => setUri(e.target.value)}
-                placeholder="ipfs://.../metadata.json"
-                required
-              />
-              <span className="mt-2 block font-normal text-white/30">
-                Metadata JSON should contain the image URI, description and
-                social links.
-              </span>
-            </label>
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block text-xs font-bold text-white/55">
                 X / TWITTER{" "}

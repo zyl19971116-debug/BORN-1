@@ -17,8 +17,8 @@ const steps = [
   ],
   [
     "04",
-    "WIN 1M BORN DAILY",
-    "At 00:00 UTC, the previous day's top token creator receives 1M BORN.",
+    "DISCOVER WHAT LEADS",
+    "Follow live market caps and the previous day's final ranking.",
   ],
 ];
 export default function How() {

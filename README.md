@@ -52,7 +52,7 @@ Meme 图片优先读取 Registry 的链上 `metadataURI`，支持元数据中的
 
 ## Permissionless launch 与每日 BORN 奖励
 
-`PermissionlessMemeFactory` 允许任何连接钱包调用 `createToken`，并永久记录 Token 与创建者。`BornToken` 固定总量 10 亿枚、没有后续增发入口。部署脚本会预存 3.65 亿 BORN 至 `DailyBornRewards`，按每天 100 万枚支持最多 365 天奖励。`DailyMarketCapOracle` 负责写入已结束 UTC 日期的可信市值冠军；创建者不能自行提交市值。`DailyBornRewards.settleDay` 每日只能成功一次，并将奖励直接发送给工厂记录的创建者地址。
+`PermissionlessMemeFactory` 允许任何连接钱包调用 `createToken`，并永久记录 Token 与创建者。`BornToken` 固定总量 10 亿枚、没有后续增发入口。`DailyMarketCapOracle` 用于记录实时市值及已结束 UTC 日期的最终排行榜；创建者不能自行提交市值。项目不再根据每日市值排名发放 BORN 奖励。
 
 ```bash
 npm run deploy:community:testnet

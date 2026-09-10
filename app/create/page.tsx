@@ -294,10 +294,6 @@ export default function Create() {
                 <span>Platform fee</span>
                 <b className="text-white">0%</b>
               </div>
-              <div className="mt-2 flex justify-between">
-                <span>Daily creator reward</span>
-                <b className="lime">1M BORN</b>
-              </div>
             </div>
             <button
               disabled={busy}

@@ -13,7 +13,7 @@ export default async function Profile({
           ["TOKENS CREATED", "12"],
           ["TOP-10 FINISHES", "6"],
           ["BEST MARKET CAP", "$18.2M"],
-          ["BORN REWARDS", "1M"],
+          ["TOKENS HELD", "24"],
         ].map((x) => (
           <div className="card p-6" key={x[0]}>
             <span className="muted text-xs">{x[0]}</span>

@@ -17,25 +17,10 @@ async function main() {
   const born = await Born.deploy(deployer.address);
   await born.waitForDeployment();
 
-  const Rewards = await ethers.getContractFactory("DailyBornRewards");
-  const rewards = await Rewards.deploy(
-    await born.getAddress(),
-    await factory.getAddress(),
-    await oracle.getAddress()
-  );
-  await rewards.waitForDeployment();
-
-  const funding = await born.transfer(
-    await rewards.getAddress(),
-    365_000_000n * 10n ** 18n
-  );
-  await funding.wait();
-
   console.log({
     born: await born.getAddress(),
     factory: await factory.getAddress(),
     oracle: await oracle.getAddress(),
-    rewards: await rewards.getAddress(),
   });
 }
 

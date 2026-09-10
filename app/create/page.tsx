@@ -161,9 +161,6 @@ export default function Create() {
           <div className="flex items-center justify-between border-b border-white/10 px-6 py-5">
             <div>
               <h2 className="text-xl font-black">Token Launch</h2>
-              <p className="mt-1 text-xs text-white/40">
-                1,000,000,000 fixed supply · sent to the creator wallet
-              </p>
             </div>
             <Rocket className="lime" size={22} />
           </div>

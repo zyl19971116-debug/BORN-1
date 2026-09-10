@@ -7,18 +7,18 @@ const steps = [
   ],
   [
     "02",
-    "VOTE FOR A MEME",
-    "Every wallet gets one irreversible vote per round.",
+    "CREATE A MEME TOKEN",
+    "Choose a name, ticker and artwork, then launch it from your wallet.",
   ],
   [
     "03",
-    "ONE MEME WINS EVERY DAY",
-    "When the 24-hour round expires, the top onchain vote-getter wins.",
+    "GROW ITS MARKET CAP",
+    "Every token launched here appears in the live market-cap ranking.",
   ],
   [
     "04",
-    "WINNER BECOMES A TOKEN",
-    "The protocol deploys the token and opens trading.",
+    "WIN 1M BORN DAILY",
+    "At 00:00 UTC, the previous day's top token creator receives 1M BORN.",
   ],
 ];
 export default function How() {
@@ -43,14 +43,14 @@ export default function How() {
       </div>
       <div className="mt-20 text-center">
         <h2 className="text-3xl font-black">
-          NO PRESALE.
+          PERMISSIONLESS CREATION.
           <br />
-          NO CREATOR LAUNCH BUTTON.
+          LIVE ONCHAIN MARKET CAPS.
           <br />
-          <span className="lime">THE INTERNET DECIDES.</span>
+          <span className="lime">THE MARKET DECIDES.</span>
         </h2>
-        <Link className="btn btn-primary mt-8" href="/vote">
-          ENTER CURRENT ROUND
+        <Link className="btn btn-primary mt-8" href="/create">
+          CREATE A TOKEN
         </Link>
       </div>
     </section>

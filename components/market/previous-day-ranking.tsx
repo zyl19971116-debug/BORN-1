@@ -1,0 +1,199 @@
+"use client";
+import { useEffect, useState } from "react";
+import { robinhoodClient } from "@/lib/robinhood";
+
+type Row = {
+  token: string;
+  creator: string;
+  name: string;
+  ticker: string;
+  cap: bigint;
+};
+const USD = 100000000n;
+const fallback: Row[] = [
+  {
+    token: "demo-1",
+    creator: "0x82A7...91AF",
+    name: "Fartcoin",
+    ticker: "FARTCOIN",
+    cap: 1180000000n * USD,
+  },
+  {
+    token: "demo-2",
+    creator: "0x193B...71DE",
+    name: "Bonk",
+    ticker: "BONK",
+    cap: 269000000n * USD,
+  },
+  {
+    token: "demo-3",
+    creator: "0xF02C...43A1",
+    name: "dogwifhat",
+    ticker: "WIF",
+    cap: 231000000n * USD,
+  },
+  {
+    token: "demo-4",
+    creator: "0x771E...C918",
+    name: "Pudgy Penguins",
+    ticker: "PENGU",
+    cap: 186000000n * USD,
+  },
+  {
+    token: "demo-5",
+    creator: "0xA891...0EE2",
+    name: "Popcat",
+    ticker: "POPCAT",
+    cap: 92000000n * USD,
+  },
+];
+const factoryAbi = [
+  {
+    type: "function",
+    name: "launchCount",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "getLaunch",
+    stateMutability: "view",
+    inputs: [{ type: "uint256" }],
+    outputs: [
+      {
+        type: "tuple",
+        components: [
+          { name: "token", type: "address" },
+          { name: "creator", type: "address" },
+          { name: "name", type: "string" },
+          { name: "ticker", type: "string" },
+          { name: "metadataURI", type: "string" },
+          { name: "createdAt", type: "uint256" },
+        ],
+      },
+    ],
+  },
+] as const;
+const oracleAbi = [
+  {
+    type: "function",
+    name: "getDailyRanking",
+    stateMutability: "view",
+    inputs: [{ type: "uint256" }],
+    outputs: [{ type: "address[]" }, { type: "uint256[]" }],
+  },
+] as const;
+function money(v: bigint) {
+  const n = Number(v) / 1e8;
+  return n >= 1e9
+    ? `$${(n / 1e9).toFixed(2)}B`
+    : n >= 1e6
+    ? `$${(n / 1e6).toFixed(1)}M`
+    : `$${n.toLocaleString()}`;
+}
+function short(a: string) {
+  return a.startsWith("0x") && a.length > 16
+    ? `${a.slice(0, 8)}...${a.slice(-6)}`
+    : a;
+}
+
+export function PreviousDayRanking() {
+  const [rows, setRows] = useState(fallback);
+  const [live, setLive] = useState(false);
+  const day = Math.floor(Date.now() / 86400000) - 1;
+  useEffect(() => {
+    const factory = process.env.NEXT_PUBLIC_COMMUNITY_FACTORY_ADDRESS as
+      | `0x${string}`
+      | undefined;
+    const oracle = process.env.NEXT_PUBLIC_DAILY_ORACLE_ADDRESS as
+      | `0x${string}`
+      | undefined;
+    if (!factory || !oracle) return;
+    (async () => {
+      try {
+        const [tokens, caps] = await robinhoodClient.readContract({
+          address: oracle,
+          abi: oracleAbi,
+          functionName: "getDailyRanking",
+          args: [BigInt(day)],
+        });
+        const count = await robinhoodClient.readContract({
+          address: factory,
+          abi: factoryAbi,
+          functionName: "launchCount",
+        });
+        const start = count > 200n ? count - 200n : 0n;
+        const launches = await Promise.all(
+          Array.from({ length: Number(count - start) }, (_, i) =>
+            robinhoodClient.readContract({
+              address: factory,
+              abi: factoryAbi,
+              functionName: "getLaunch",
+              args: [start + BigInt(i)],
+            })
+          )
+        );
+        const byToken = new Map(
+          launches.map((item) => [item.token.toLowerCase(), item])
+        );
+        const ranked = tokens.map((token, i) => {
+          const item = byToken.get(token.toLowerCase());
+          return {
+            token,
+            creator: item?.creator ?? "Unknown",
+            name: item?.name ?? "MEME//BORN Token",
+            ticker: item?.ticker ?? "BORN",
+            cap: caps[i],
+          };
+        });
+        if (ranked.length) {
+          setRows(ranked.slice(0, 20));
+          setLive(true);
+        }
+      } catch {
+        setLive(false);
+      }
+    })();
+  }, [day]);
+  const date = new Date(day * 86400000).toISOString().slice(0, 10);
+  return (
+    <div className="card mt-10 overflow-hidden">
+      <div className="flex items-center justify-between border-b border-white/10 p-5">
+        <div>
+          <b>{date} · UTC</b>
+          <p className="mt-1 text-[11px] text-white/40">
+            Final market-cap snapshot for tokens created on MEME//BORN
+          </p>
+        </div>
+        <span className={live ? "lime text-xs" : "text-xs text-amber-400"}>
+          {live ? "ONCHAIN FINAL" : "DEMO DATA"}
+        </span>
+      </div>
+      <div className="grid grid-cols-[50px_1fr_110px] gap-3 border-b border-white/10 p-4 text-[10px] uppercase text-white/35 md:grid-cols-[70px_1fr_180px_140px]">
+        <span>Rank</span>
+        <span>Token</span>
+        <span className="hidden md:block">Creator</span>
+        <span className="text-right">Market cap</span>
+      </div>
+      {rows.map((row, i) => (
+        <div
+          key={row.token}
+          className="grid grid-cols-[50px_1fr_110px] items-center gap-3 border-b border-white/5 p-4 text-sm md:grid-cols-[70px_1fr_180px_140px]"
+        >
+          <b className={i < 3 ? "lime" : ""}>#{i + 1}</b>
+          <div>
+            <b>{row.name}</b>
+            <span className="block text-[10px] text-white/35">
+              ${row.ticker}
+            </span>
+          </div>
+          <span className="hidden font-mono text-xs text-white/50 md:block">
+            {short(row.creator)}
+          </span>
+          <b className="text-right">{money(row.cap)}</b>
+        </div>
+      ))}
+    </div>
+  );
+}

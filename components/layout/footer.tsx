@@ -8,16 +8,16 @@ export function Footer() {
             MEME<span className="lime">//</span>BORN
           </div>
           <p className="mt-4 text-2xl font-bold leading-tight">
-            ONE DAY. ONE MEME.
+            CREATE. GROW. LEAD.
             <br />
             ONE TOKEN.
           </p>
           <p className="muted mt-3 text-sm">
-            The internet decides what gets born.
+            Community tokens, launched permissionlessly.
           </p>
         </div>
         <div className="grid grid-cols-2 gap-x-12 gap-y-3 text-sm text-white/60">
-          <Link href="/vote">Vote</Link>
+          <Link href="/create">Create</Link>
           <Link href="/born">Born</Link>
           <Link href="/leaderboard">Leaderboard</Link>
           <Link href="/how-it-works">How It Works</Link>

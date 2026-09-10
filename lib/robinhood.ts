@@ -1,6 +1,105 @@
-import {createPublicClient,defineChain,http} from "viem";
-export const robinhood=defineChain({id:4663,name:"Robinhood Chain",nativeCurrency:{name:"Ether",symbol:"ETH",decimals:18},rpcUrls:{default:{http:[process.env.NEXT_PUBLIC_RH_RPC_URL||"https://rpc.mainnet.chain.robinhood.com"]}},blockExplorers:{default:{name:"Blockscout",url:"https://robinhoodchain.blockscout.com"}}});
-export const robinhoodClient=createPublicClient({chain:robinhood,transport:http()});
-export const votingAbi=[{type:"function",name:"currentRoundId",stateMutability:"view",inputs:[],outputs:[{type:"uint256"}]},{type:"function",name:"getRound",stateMutability:"view",inputs:[{name:"id",type:"uint256"}],outputs:[{type:"tuple",components:[{name:"roundId",type:"uint256"},{name:"startTime",type:"uint256"},{name:"endTime",type:"uint256"},{name:"candidateMemeIds",type:"uint256[]"},{name:"winnerId",type:"uint256"},{name:"finalized",type:"bool"},{name:"seed",type:"bytes32"}]}]},{type:"function",name:"getVotes",stateMutability:"view",inputs:[{name:"roundId",type:"uint256"},{name:"memeId",type:"uint256"}],outputs:[{type:"uint256"}]},{type:"function",name:"finalizeRound",stateMutability:"nonpayable",inputs:[],outputs:[{type:"uint256"}]},{type:"event",name:"VoteCast",inputs:[{name:"roundId",type:"uint256",indexed:true},{name:"voter",type:"address",indexed:true},{name:"memeId",type:"uint256",indexed:true}]}] as const;
-export const registryAbi=[{type:"function",name:"getMeme",stateMutability:"view",inputs:[{name:"id",type:"uint256"}],outputs:[{type:"tuple",components:[{name:"id",type:"uint256"},{name:"name",type:"string"},{name:"ticker",type:"string"},{name:"metadataURI",type:"string"},{name:"status",type:"uint8"},{name:"tokenAddress",type:"address"}]}]}] as const;
-export function resolveContentUri(uri:string){if(uri.startsWith("ipfs://"))return `https://ipfs.io/ipfs/${uri.slice(7)}`;if(uri.startsWith("ar://"))return `https://arweave.net/${uri.slice(5)}`;return uri;}
+import { createPublicClient, defineChain, http } from "viem";
+export const robinhood = defineChain({
+  id: 4663,
+  name: "Robinhood Chain",
+  nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+  rpcUrls: {
+    default: {
+      http: [
+        process.env.NEXT_PUBLIC_RH_RPC_URL ||
+          "https://rpc.mainnet.chain.robinhood.com",
+      ],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: "Blockscout",
+      url: "https://robinhoodchain.blockscout.com",
+    },
+  },
+});
+export const robinhoodClient = createPublicClient({
+  chain: robinhood,
+  transport: http(),
+});
+export const votingAbi = [
+  {
+    type: "function",
+    name: "currentRoundId",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "getRound",
+    stateMutability: "view",
+    inputs: [{ name: "id", type: "uint256" }],
+    outputs: [
+      {
+        type: "tuple",
+        components: [
+          { name: "roundId", type: "uint256" },
+          { name: "startTime", type: "uint256" },
+          { name: "endTime", type: "uint256" },
+          { name: "candidateMemeIds", type: "uint256[]" },
+          { name: "winnerId", type: "uint256" },
+          { name: "finalized", type: "bool" },
+          { name: "seed", type: "bytes32" },
+        ],
+      },
+    ],
+  },
+  {
+    type: "function",
+    name: "getVotes",
+    stateMutability: "view",
+    inputs: [
+      { name: "roundId", type: "uint256" },
+      { name: "memeId", type: "uint256" },
+    ],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "finalizeRound",
+    stateMutability: "nonpayable",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "event",
+    name: "VoteCast",
+    inputs: [
+      { name: "roundId", type: "uint256", indexed: true },
+      { name: "voter", type: "address", indexed: true },
+      { name: "memeId", type: "uint256", indexed: true },
+    ],
+  },
+] as const;
+export const registryAbi = [
+  {
+    type: "function",
+    name: "getMeme",
+    stateMutability: "view",
+    inputs: [{ name: "id", type: "uint256" }],
+    outputs: [
+      {
+        type: "tuple",
+        components: [
+          { name: "id", type: "uint256" },
+          { name: "name", type: "string" },
+          { name: "ticker", type: "string" },
+          { name: "metadataURI", type: "string" },
+          { name: "status", type: "uint8" },
+          { name: "tokenAddress", type: "address" },
+        ],
+      },
+    ],
+  },
+] as const;
+export function resolveContentUri(uri: string) {
+  if (uri.startsWith("ipfs://")) return `https://ipfs.io/ipfs/${uri.slice(7)}`;
+  if (uri.startsWith("ar://")) return `https://arweave.net/${uri.slice(5)}`;
+  return uri;
+}

@@ -1,1 +1,5 @@
-import {LiveRace} from "@/components/voting/live-race";export default function Vote(){return <div className="pt-16"><div className="container"><div className="eyebrow">CURRENT ROUND</div><h1 className="section-title mt-3">VOTING ARENA</h1><p className="muted mt-4">One wallet. One vote. No changes after confirmation.</p></div><LiveRace full/></div>}
+import { redirect } from "next/navigation";
+
+export default function Vote() {
+  redirect("/leaderboard");
+}

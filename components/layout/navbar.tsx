@@ -21,9 +21,8 @@ export function Navbar() {
             HOME
           </Link>
           <Link href="/create">CREATE</Link>
-          <Link href="/vote">RANKING</Link>
+          <Link href="/leaderboard">RANKING</Link>
           <Link href="/born">BORN</Link>
-          <Link href="/leaderboard">LEADERBOARD</Link>
           <Link href="/how-it-works">DOCS</Link>
         </nav>
         <div className="flex items-center gap-2">

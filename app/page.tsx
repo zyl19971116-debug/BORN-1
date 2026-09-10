@@ -1,14 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { LiveRace } from "@/components/voting/live-race";
+import { SiteMarketLeaders } from "@/components/market/site-market-leaders";
 import { bornMemes } from "@/data/memes";
-const trend = [
-  { name: "Fartcoin", ticker: "FARTCOIN", cap: "SOL", gain: "HOT" },
-  { name: "Bonk", ticker: "BONK", cap: "SOL", gain: "HOT" },
-  { name: "dogwifhat", ticker: "WIF", cap: "SOL", gain: "HOT" },
-  { name: "Pudgy Penguins", ticker: "PENGU", cap: "SOL", gain: "HOT" },
-  { name: "Popcat", ticker: "POPCAT", cap: "SOL", gain: "HOT" },
-];
 export default function Home() {
   return (
     <div className="container">
@@ -24,7 +17,7 @@ export default function Home() {
             </span>
           </h1>
           <p className="mt-6 max-w-md text-lg font-semibold text-white/75">
-            Win the day.
+            Launch your meme.
             <br />
             It becomes a token.
           </p>
@@ -40,7 +33,7 @@ export default function Home() {
             {[
               ["12,482", "MEMES"],
               ["1,203", "TOKENS BORN"],
-              ["428,913", "TOTAL VOTERS"],
+              ["428,913", "TOTAL HOLDERS"],
               ["∞", "BETTER MEMES"],
             ].map((x, i) => (
               <div
@@ -74,7 +67,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <LiveRace />
       <section className="mt-5 grid gap-5 lg:grid-cols-[1.45fr_1fr]">
         <div className="card p-5">
           <div className="flex items-center justify-between">
@@ -114,37 +106,7 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <div className="card p-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="font-black">▥ &nbsp; TRENDING</h2>
-              <p className="mt-1 text-[11px] text-white/40">
-                Most traded meme tokens right now.
-              </p>
-            </div>
-            <Link className="btn px-3 py-2 text-[10px]" href="/born">
-              VIEW ALL →
-            </Link>
-          </div>
-          <div className="mt-4">
-            {trend.map((t, i) => (
-              <div
-                className="grid grid-cols-[24px_1fr_70px_62px] items-center gap-2 border-t border-white/[.06] py-3 text-xs"
-                key={t.ticker}
-              >
-                <span className="text-white/35">{i + 1}</span>
-                <div>
-                  <b>{t.name}</b>
-                  <span className="block text-[9px] text-white/35">
-                    ${t.ticker}
-                  </span>
-                </div>
-                <b className="text-right">{t.cap}</b>
-                <b className="text-right text-[#78f2a4]">▲ {t.gain}</b>
-              </div>
-            ))}
-          </div>
-        </div>
+        <SiteMarketLeaders />
       </section>
       <div className="py-14 text-center text-[10px] tracking-[.5em] text-white/35">
         SAME PEOPLE. A BRIGHTER WEB3. · MEME//BORN

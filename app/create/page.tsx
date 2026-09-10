@@ -11,7 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { createWalletClient, custom } from "viem";
-import { robinhood } from "@/lib/robinhood";
+import { robinhood, robinhoodClient } from "@/lib/robinhood";
 
 const factoryAbi = [
   {
@@ -135,7 +135,13 @@ export default function Create() {
         args: [name.trim(), ticker.trim().toUpperCase(), metadata],
       });
       setHash(tx);
-      setStatus("Token creation submitted directly to Robinhood Chain.");
+      setStatus(
+        "Transaction submitted. Waiting for Robinhood Chain confirmation…"
+      );
+      await robinhoodClient.waitForTransactionReceipt({ hash: tx });
+      setStatus(
+        "Token created and confirmed. It will appear in Explore automatically."
+      );
     } catch (err) {
       setStatus(err instanceof Error ? err.message : "Transaction cancelled");
     } finally {

@@ -1,0 +1,9 @@
+{
+  "chainId": 4663,
+  "network": "Robinhood Chain",
+  "born": "0x0D4a559A73990553062b4844AD8ad65478dF9E3f",
+  "factory": "0xDEe4e837f2ed6bDd9B5Fc114408A057d6D7BE5e1",
+  "oracle": "0x1D4C453f8862440f4Adba122de3735bCd0e85daE",
+  "rewards": "0xC8CCE6ea15d9c1600F0E229B1306284aA741988E",
+  "explorer": "https://robinhoodchain.blockscout.com"
+}

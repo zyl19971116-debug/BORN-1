@@ -49,3 +49,14 @@ npx hardhat run scripts/deploy.ts --network <network>
 Robinhood Chain 主网 Chain ID 为 `4663`，测试网为 `46630`。请先执行 `npm run deploy:robinhood:testnet` 完整测试，再部署主网。部署地址写入 `.env.local` 后，使用 `npm run keeper` 启动结算进程；Keeper 每 15 秒检查当前轮次，到达 `endTime` 后调用 `finalizeRound()`，工厂合约随即发行获胜 Token。Keeper 钱包必须持有少量 ETH 支付 Gas，`PRIVATE_KEY` 只能配置在服务器环境变量中。
 
 Meme 图片优先读取 Registry 的链上 `metadataURI`，支持元数据中的 `ipfs://`、`ar://` 或 HTTPS `image` 字段。链上元数据不可用时，界面自动回退到项目内相似头像。
+
+## Permissionless launch 与每日 BORN 奖励
+
+`PermissionlessMemeFactory` 允许任何连接钱包调用 `createToken`，并永久记录 Token 与创建者。`BornToken` 固定总量 10 亿枚、没有后续增发入口。部署脚本会预存 3.65 亿 BORN 至 `DailyBornRewards`，按每天 100 万枚支持最多 365 天奖励。`DailyMarketCapOracle` 负责写入已结束 UTC 日期的可信市值冠军；创建者不能自行提交市值。`DailyBornRewards.settleDay` 每日只能成功一次，并将奖励直接发送给工厂记录的创建者地址。
+
+```bash
+npm run deploy:community:testnet
+npm run deploy:community
+```
+
+生产环境必须使用经过审计的 DEX TWAP/Chainlink Data Streams 报价服务控制 Oracle，并对 Reporter 使用多签或限权自动化账户。未经可信 Oracle 配置不得开启真实奖励。

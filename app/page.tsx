@@ -29,8 +29,8 @@ export default function Home() {
             It becomes a token.
           </p>
           <div className="mt-7 flex gap-3">
-            <Link href="/vote" className="btn btn-primary min-w-44">
-              VOTE FOR A MEME →
+            <Link href="/create" className="btn btn-primary min-w-44">
+              CREATE A TOKEN →
             </Link>
             <Link href="/how-it-works" className="btn min-w-36">
               ◉ &nbsp; HOW IT WORKS

@@ -43,3 +43,9 @@ npx hardhat run scripts/deploy.ts --network <network>
 ## 原创视觉
 
 首页 Meme Egg 主视觉由 OpenAI 图像生成工具为本项目生成；候选头像由前端代码生成，未使用知名品牌 Logo 或现有版权角色。
+
+## Robinhood Chain 自动结算
+
+Robinhood Chain 主网 Chain ID 为 `4663`，测试网为 `46630`。请先执行 `npm run deploy:robinhood:testnet` 完整测试，再部署主网。部署地址写入 `.env.local` 后，使用 `npm run keeper` 启动结算进程；Keeper 每 15 秒检查当前轮次，到达 `endTime` 后调用 `finalizeRound()`，工厂合约随即发行获胜 Token。Keeper 钱包必须持有少量 ETH 支付 Gas，`PRIVATE_KEY` 只能配置在服务器环境变量中。
+
+Meme 图片优先读取 Registry 的链上 `metadataURI`，支持元数据中的 `ipfs://`、`ar://` 或 HTTPS `image` 字段。链上元数据不可用时，界面自动回退到项目内相似头像。

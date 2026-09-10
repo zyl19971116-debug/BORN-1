@@ -1,0 +1,6 @@
+import {createPublicClient,createWalletClient,http} from "viem";import {privateKeyToAccount} from "viem/accounts";import {robinhood,votingAbi} from "../lib/robinhood";
+const address=process.env.NEXT_PUBLIC_VOTING_ADDRESS as `0x${string}`|undefined,key=process.env.PRIVATE_KEY as `0x${string}`|undefined;
+if(!address||!key)throw new Error("Set NEXT_PUBLIC_VOTING_ADDRESS and PRIVATE_KEY");
+const account=privateKeyToAccount(key),publicClient=createPublicClient({chain:robinhood,transport:http(process.env.RH_RPC_URL)}),wallet=createWalletClient({account,chain:robinhood,transport:http(process.env.RH_RPC_URL)});
+async function tick(){const id=await publicClient.readContract({address,abi:votingAbi,functionName:"currentRoundId"});const round=await publicClient.readContract({address,abi:votingAbi,functionName:"getRound",args:[id]});const now=BigInt(Math.floor(Date.now()/1000));if(!round[5]&&now>=round[2]){const hash=await wallet.writeContract({address,abi:votingAbi,functionName:"finalizeRound"});console.log("Finalizing round",id.toString(),hash);await publicClient.waitForTransactionReceipt({hash});}}
+console.log("MEME//BORN keeper running on Robinhood Chain");tick();setInterval(()=>tick().catch(console.error),15000);

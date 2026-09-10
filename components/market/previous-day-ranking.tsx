@@ -9,44 +9,6 @@ type Row = {
   ticker: string;
   cap: bigint;
 };
-const USD = 100000000n;
-const fallback: Row[] = [
-  {
-    token: "demo-1",
-    creator: "0x82A7...91AF",
-    name: "Fartcoin",
-    ticker: "FARTCOIN",
-    cap: 1180000000n * USD,
-  },
-  {
-    token: "demo-2",
-    creator: "0x193B...71DE",
-    name: "Bonk",
-    ticker: "BONK",
-    cap: 269000000n * USD,
-  },
-  {
-    token: "demo-3",
-    creator: "0xF02C...43A1",
-    name: "dogwifhat",
-    ticker: "WIF",
-    cap: 231000000n * USD,
-  },
-  {
-    token: "demo-4",
-    creator: "0x771E...C918",
-    name: "Pudgy Penguins",
-    ticker: "PENGU",
-    cap: 186000000n * USD,
-  },
-  {
-    token: "demo-5",
-    creator: "0xA891...0EE2",
-    name: "Popcat",
-    ticker: "POPCAT",
-    cap: 92000000n * USD,
-  },
-];
 const factoryAbi = [
   {
     type: "function",
@@ -99,8 +61,8 @@ function short(a: string) {
 }
 
 export function PreviousDayRanking() {
-  const [rows, setRows] = useState(fallback);
-  const [live, setLive] = useState(false);
+  const [rows, setRows] = useState<Row[]>([]);
+  const [state, setState] = useState<"loading" | "ready" | "error">("loading");
   const day = Math.floor(Date.now() / 86400000) - 1;
   useEffect(() => {
     const factory = process.env.NEXT_PUBLIC_COMMUNITY_FACTORY_ADDRESS as
@@ -109,7 +71,10 @@ export function PreviousDayRanking() {
     const oracle = process.env.NEXT_PUBLIC_DAILY_ORACLE_ADDRESS as
       | `0x${string}`
       | undefined;
-    if (!factory || !oracle) return;
+    if (!factory || !oracle) {
+      setState("error");
+      return;
+    }
     (async () => {
       try {
         const [tokens, caps] = await robinhoodClient.readContract({
@@ -137,22 +102,24 @@ export function PreviousDayRanking() {
         const byToken = new Map(
           launches.map((item) => [item.token.toLowerCase(), item])
         );
-        const ranked = tokens.map((token, i) => {
+        const ranked = tokens.flatMap((token, i) => {
           const item = byToken.get(token.toLowerCase());
-          return {
-            token,
-            creator: item?.creator ?? "Unknown",
-            name: item?.name ?? "MEME//BORN Token",
-            ticker: item?.ticker ?? "BORN",
-            cap: caps[i],
-          };
+          return item
+            ? [
+                {
+                  token,
+                  creator: item.creator,
+                  name: item.name,
+                  ticker: item.ticker,
+                  cap: caps[i],
+                },
+              ]
+            : [];
         });
-        if (ranked.length) {
-          setRows(ranked.slice(0, 20));
-          setLive(true);
-        }
+        setRows(ranked.slice(0, 20));
+        setState("ready");
       } catch {
-        setLive(false);
+        setState("error");
       }
     })();
   }, [day]);
@@ -166,8 +133,16 @@ export function PreviousDayRanking() {
             Final market-cap snapshot for tokens created on MEME//BORN
           </p>
         </div>
-        <span className={live ? "lime text-xs" : "text-xs text-amber-400"}>
-          {live ? "ONCHAIN FINAL" : "DEMO DATA"}
+        <span
+          className={
+            state === "ready" ? "lime text-xs" : "text-xs text-amber-400"
+          }
+        >
+          {state === "ready"
+            ? "ONCHAIN DATA"
+            : state === "loading"
+            ? "LOADING"
+            : "RPC ERROR"}
         </span>
       </div>
       <div className="grid grid-cols-[50px_1fr_110px] gap-3 border-b border-white/10 p-4 text-[10px] uppercase text-white/35 md:grid-cols-[70px_1fr_180px_140px]">
@@ -176,6 +151,11 @@ export function PreviousDayRanking() {
         <span className="hidden md:block">Creator</span>
         <span className="text-right">Market cap</span>
       </div>
+      {state === "ready" && rows.length === 0 && (
+        <div className="p-12 text-center text-sm text-white/45">
+          No finalized ranking exists for this date.
+        </div>
+      )}
       {rows.map((row, i) => (
         <div
           key={row.token}

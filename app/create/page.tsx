@@ -47,6 +47,7 @@ export default function Create() {
   const [status, setStatus] = useState("");
   const [hash, setHash] = useState("");
   const [busy, setBusy] = useState(false);
+  const [launchCount, setLaunchCount] = useState<bigint | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   useEffect(
     () => () => {
@@ -54,6 +55,28 @@ export default function Create() {
     },
     [preview]
   );
+  useEffect(() => {
+    const factory = process.env.NEXT_PUBLIC_COMMUNITY_FACTORY_ADDRESS as
+      | `0x${string}`
+      | undefined;
+    if (!factory) return;
+    robinhoodClient
+      .readContract({
+        address: factory,
+        abi: [
+          {
+            type: "function",
+            name: "launchCount",
+            stateMutability: "view",
+            inputs: [],
+            outputs: [{ type: "uint256" }],
+          },
+        ] as const,
+        functionName: "launchCount",
+      })
+      .then(setLaunchCount)
+      .catch(() => setLaunchCount(null));
+  }, []);
 
   function selectImage(file?: File) {
     if (!file) return;
@@ -150,27 +173,36 @@ export default function Create() {
   }
 
   return (
-    <section className="container py-14">
-      <div className="mx-auto max-w-3xl">
-        <div className="mb-7 flex items-end justify-between gap-4">
-          <div>
-            <div className="eyebrow">PERMISSIONLESS LAUNCH</div>
-            <h1 className="mt-2 text-4xl font-black tracking-[-.045em]">
-              CREATE ON ROBINHOOD
-            </h1>
-          </div>
-          <div className="hidden items-center gap-2 rounded-full border border-[#78f2a4]/25 bg-[#78f2a4]/5 px-4 py-2 text-[11px] font-bold text-[#78f2a4] sm:flex">
-            <i className="live-dot" /> ROBINHOOD MAINNET
-          </div>
-        </div>
+    <section className="container py-10">
+      <div className="mx-auto max-w-2xl">
         <form onSubmit={submit} className="card overflow-hidden">
           <div className="flex items-center justify-between border-b border-white/10 px-6 py-5">
             <div>
-              <h2 className="text-xl font-black">Token Launch</h2>
+              <h2 className="text-xl font-black">
+                CREATE TOKEN{" "}
+                <span className="ml-2 rounded-full bg-[#78f2a4] px-2 py-1 text-[10px] text-black">
+                  0% PLATFORM FEE
+                </span>
+              </h2>
+              <p className="mt-1 text-[11px] text-white/35">
+                {launchCount === null
+                  ? "READING ONCHAIN…"
+                  : `${launchCount.toLocaleString()} TOKENS CREATED`}
+              </p>
             </div>
-            <Rocket className="lime" size={22} />
+            <X className="text-white/35" size={22} />
           </div>
           <div className="space-y-6 p-6">
+            <div className="rounded-xl border border-white/10 bg-white/[.025] p-4">
+              <div className="flex items-center justify-between">
+                <b className="text-sm">ROBINHOOD MAINNET LAUNCH</b>
+                <span className="lime text-xs">LIVE ↗</span>
+              </div>
+              <p className="mt-2 truncate text-xs text-white/45">
+                One wallet confirmation creates your ERC-20 token directly
+                through the MEME//BORN factory.
+              </p>
+            </div>
             <div>
               <div className="mb-3 text-xs font-bold text-white/55">
                 CHOOSE TOKEN IMAGE
@@ -285,14 +317,39 @@ export default function Create() {
                 />
               </label>
             </div>
-            <div className="rounded-xl border border-white/10 bg-black/25 p-4 text-xs text-white/45">
-              <div className="flex justify-between">
-                <span>Network</span>
-                <b className="text-white">Robinhood Chain · 4663</b>
+            <div>
+              <div className="mb-3 flex items-center justify-between text-xs font-bold text-white/55">
+                <span>PLATFORM</span>
+                <span className="lime">⚡ ROBINHOOD</span>
               </div>
-              <div className="mt-2 flex justify-between">
-                <span>Platform fee</span>
-                <b className="text-white">0%</b>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-xl border border-[#78f2a4] bg-[#78f2a4]/10 p-4 text-center">
+                  <b className="lime">DIRECT ERC-20</b>
+                  <span className="mt-1 block text-[10px] text-white/40">
+                    FACTORY LAUNCH
+                  </span>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/[.025] p-4 text-center">
+                  <b>ONCHAIN DATA</b>
+                  <span className="mt-1 block text-[10px] text-white/40">
+                    PERMANENT RECORD
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div className="mb-3 text-xs font-bold text-white/55">
+                LAUNCH PRESET
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-xl border border-white/10 bg-white/[.025] p-4">
+                  <span className="text-[10px] text-white/35">NETWORK</span>
+                  <b className="mt-1 block">Robinhood · 4663</b>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/[.025] p-4">
+                  <span className="text-[10px] text-white/35">SUPPLY</span>
+                  <b className="mt-1 block">1,000,000,000</b>
+                </div>
               </div>
             </div>
             <button
@@ -306,7 +363,7 @@ export default function Create() {
                 </>
               ) : (
                 <>
-                  LAUNCH TOKEN ON ROBINHOOD <Rocket size={17} />
+                  CREATE ON ROBINHOOD <Rocket size={17} />
                 </>
               )}
             </button>

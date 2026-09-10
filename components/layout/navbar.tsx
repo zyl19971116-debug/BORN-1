@@ -1,9 +1,11 @@
 "use client";
 import { useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useAppStore } from "@/store/use-app-store";
 import { Globe2 } from "lucide-react";
 export function Navbar() {
+  const pathname = usePathname();
   const { address, setWalletOpen, restoreWallet } = useAppStore();
   useEffect(() => {
     restoreWallet();
@@ -20,14 +22,30 @@ export function Navbar() {
           </span>
           MEME<span className="lime">//</span>BORN
         </Link>
-        <nav className="desktop-nav flex gap-8 text-[11px] font-bold text-white/50">
-          <Link className="lime" href="/">
-            HOME
-          </Link>
-          <Link href="/create">CREATE</Link>
-          <Link href="/leaderboard">RANKING</Link>
-          <Link href="/born">BORN</Link>
-          <Link href="/how-it-works">DOCS</Link>
+        <nav className="desktop-nav flex gap-8 text-[11px] font-bold">
+          {[
+            ["/", "HOME"],
+            ["/create", "CREATE"],
+            ["/leaderboard", "RANKING"],
+            ["/born", "BORN"],
+            ["/how-it-works", "DOCS"],
+          ].map(([href, label]) => {
+            const active =
+              href === "/" ? pathname === "/" : pathname.startsWith(href);
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={`transition-colors ${
+                  active
+                    ? "text-[#78f2a4]"
+                    : "text-white/45 hover:text-white/75"
+                }`}
+              >
+                {label}
+              </Link>
+            );
+          })}
         </nav>
         <div className="flex items-center gap-2">
           <div className="desktop-nav btn h-10 py-0 text-[11px]">

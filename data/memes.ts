@@ -1,8 +1,112 @@
 import { Meme } from "@/types";
 const raw = [
- ["Dogecoin","DOGE","D","The original dog-powered internet currency."],["Shiba Inu","SHIB","S","A global community built around the iconic Shiba."],["Pepe","PEPE","P","One of crypto culture's most recognized meme tokens."],["Bonk","BONK","B","The community dog coin from the Solana ecosystem."],["Official Trump","TRUMP","T","A politically themed meme token inspired by Donald Trump."],["dogwifhat","WIF","W","A dog, a hat, and a very persistent community."],["FLOKI","FLOKI","F","A Viking-themed dog token with a broad ecosystem."],["Pudgy Penguins","PENGU","P","The community token of the penguin-native internet brand."],["SPX6900","SPX","S","A satirical internet-native market culture token."],["Mog Coin","MOG","M","The internet's culture coin for effortless confidence."],["Brett","BRETT","B","A blue-chain culture token powered by its community."],["Popcat","POPCAT","P","A viral cat meme turned community coin."],["Coffee Cat","BREW","◎","The permanently caffeinated onchain cat."],["Rocket Frog","RIBT","△","The only direction is up."],["Cloud Sheep","CLOUD","≈","Too fluffy to stress about the chart."],["Quantum Pigeon","QBIT","◇","Exists on two chains at the same time."],["Midnight Raccoon","NOIR","◈","Appears only at midnight block height."],["Bread Shark","LOAF","▰","Crispy outside, liquid inside."],["Box Fox","BOX","▱","Its cardboard box is the entire metaverse."],["Zen Ape","ZEN","○","Never checks the chart, never panics."],["Lemon Whale","LEMON","◡","A gentle whale in a sour market."],["Signal Rabbit","PING","⌁","Always catches the next community signal."],["Tape Panda","TAPE","▣","A digital collector from the analog age."],["Neon Snail","SLOW","@","Slow, but never stops going onchain."],["Raincoat Penguin","DRIP","♢","Walks through every liquidity storm."],["Cheese Mouse","CHED","◍","Hunts only for golden opportunities."],["Bubble Otter","BUBL","◌","Turns market noise into bubbles."],["Glitch Goat","GLCH","⌁","System errors are part of the aesthetic."],["Sun Fish","SOLR","☼","Lights up every red candle."],["Ghost Deer","WISP","♧","Roams through abandoned blocks."]
+  ["Fartcoin", "FARTCOIN", "F", "A viral Solana meme coin driven by internet culture."],
+  [
+    "Bonk",
+    "BONK",
+    "S",
+    "The community dog coin from the Solana ecosystem.",
+  ],
+  ["dogwifhat", "WIF", "W", "A dog, a hat, and a very persistent Solana community."],
+  ["Pudgy Penguins", "PENGU", "P", "A penguin-native culture token on Solana."],
+  [
+    "Official Trump",
+    "TRUMP",
+    "T",
+    "A politically themed meme token inspired by Donald Trump.",
+  ],
+  ["Popcat", "POPCAT", "P", "A viral cat meme turned Solana community coin."],
+  ["cat in a dogs world", "MEW", "M", "A cat-led challenger in a dog-dominated meme market."],
+  [
+    "Peanut the Squirrel",
+    "PNUT",
+    "P",
+    "A viral squirrel story transformed into a Solana community token.",
+  ],
+  ["Goatseus Maximus", "GOAT", "G", "An AI-era meme token native to Solana culture."],
+  [
+    "Moo Deng",
+    "MOODENG",
+    "M",
+    "The internet-famous pygmy hippo inspired a Solana meme community.",
+  ],
+  [
+    "Ponke",
+    "PONKE",
+    "B",
+    "A high-energy monkey meme native to the Solana ecosystem.",
+  ],
+  ["Slerf", "SLERF", "S", "A sloth-themed Solana meme with an enduring community."],
+  ["Coffee Cat", "BREW", "◎", "The permanently caffeinated onchain cat."],
+  ["Rocket Frog", "RIBT", "△", "The only direction is up."],
+  ["Cloud Sheep", "CLOUD", "≈", "Too fluffy to stress about the chart."],
+  ["Quantum Pigeon", "QBIT", "◇", "Exists on two chains at the same time."],
+  ["Midnight Raccoon", "NOIR", "◈", "Appears only at midnight block height."],
+  ["Bread Shark", "LOAF", "▰", "Crispy outside, liquid inside."],
+  ["Box Fox", "BOX", "▱", "Its cardboard box is the entire metaverse."],
+  ["Zen Ape", "ZEN", "○", "Never checks the chart, never panics."],
+  ["Lemon Whale", "LEMON", "◡", "A gentle whale in a sour market."],
+  ["Signal Rabbit", "PING", "⌁", "Always catches the next community signal."],
+  ["Tape Panda", "TAPE", "▣", "A digital collector from the analog age."],
+  ["Neon Snail", "SLOW", "@", "Slow, but never stops going onchain."],
+  ["Raincoat Penguin", "DRIP", "♢", "Walks through every liquidity storm."],
+  ["Cheese Mouse", "CHED", "◍", "Hunts only for golden opportunities."],
+  ["Bubble Otter", "BUBL", "◌", "Turns market noise into bubbles."],
+  ["Glitch Goat", "GLCH", "⌁", "System errors are part of the aesthetic."],
+  ["Sun Fish", "SOLR", "☼", "Lights up every red candle."],
+  ["Ghost Deer", "WISP", "♧", "Roams through abandoned blocks."],
 ] as const;
-const positions=["0% 0%","50% 0%","100% 0%","0% 50%","50% 50%","100% 50%","0% 100%","50% 100%","100% 100%"];
-export const memes:Meme[] = raw.map((m,i)=>({id:i+1,name:m[0],ticker:m[1],emoji:m[2],description:m[3],image:i===4?"/memes/donald-trump.png":"/memes/mascot-grid.png",imagePosition:i===4?"50% 50%":positions[i%9],votes:i<12?[8421,7760,6890,6112,5580,4941,4210,3622,3140,2812,2401,2098][i]:0,status:i<12?"LIVE":i<20?"BORN":"UPCOMING",color:["#b8ff3d","#8b5cf6","#38bdf8","#fb7185","#facc15"][i%5],...(i>=12&&i<20?{bornAgo:`${(i-11)*7} min ago`,price:`$0.00${i-9}8`,marketCap:`$${428-(i-12)*31}K`,volume:`$${91-(i-12)*6}K`,change:182-(i-12)*23,holders:1829+(i-12)*217,address:`0x${(i+1).toString(16).padStart(4,"0")}...b0rn`}:{})}));
-export const liveMemes=memes.filter(m=>m.status==="LIVE");
-export const bornMemes=memes.filter(m=>m.status==="BORN");
+const positions = [
+  "0% 0%",
+  "50% 0%",
+  "100% 0%",
+  "0% 50%",
+  "50% 50%",
+  "100% 50%",
+  "0% 100%",
+  "50% 100%",
+  "100% 100%",
+];
+const tokenImages: Record<string, string> = {
+  FARTCOIN: "https://coin-images.coingecko.com/coins/images/50891/large/fart.jpg",
+  BONK: "https://coin-images.coingecko.com/coins/images/28600/large/bonk.jpg",
+  WIF: "https://coin-images.coingecko.com/coins/images/33566/large/dogwifhat.jpg",
+  PENGU: "https://coin-images.coingecko.com/coins/images/52622/large/PUDGY_PENGUINS_PENGU_PFP.png",
+  POPCAT: "https://coin-images.coingecko.com/coins/images/33760/large/image.jpg",
+  MEW: "https://coin-images.coingecko.com/coins/images/36440/large/MEW.png",
+  PNUT: "https://coin-images.coingecko.com/coins/images/51301/large/Peanut_the_Squirrel.png",
+  GOAT: "https://coin-images.coingecko.com/coins/images/50717/large/GOAT_LOGO_NEW.jpg",
+  PONKE: "https://coin-images.coingecko.com/coins/images/33929/large/ponke-logo.png",
+  SLERF: "https://coin-images.coingecko.com/coins/images/36178/large/slerf.jpeg",
+};
+export const memes: Meme[] = raw.map((m, i) => ({
+  id: i + 1,
+  name: m[0],
+  ticker: m[1],
+  emoji: m[2],
+  description: m[3],
+  image: tokenImages[m[1]] || (i === 4 ? "/memes/donald-trump.png" : "/memes/mascot-grid.png"),
+  imagePosition: tokenImages[m[1]] ? "50% 50%" : i === 4 ? "50% 50%" : positions[i % 9],
+  votes:
+    i < 12
+      ? [
+          8421, 7760, 6890, 6112, 5580, 4941, 4210, 3622, 3140, 2812, 2401,
+          2098,
+        ][i]
+      : 0,
+  status: i < 12 ? "LIVE" : i < 20 ? "BORN" : "UPCOMING",
+  color: ["#b8ff3d", "#8b5cf6", "#38bdf8", "#fb7185", "#facc15"][i % 5],
+  ...(i >= 12 && i < 20
+    ? {
+        bornAgo: `${(i - 11) * 7} min ago`,
+        price: `$0.00${i - 9}8`,
+        marketCap: `$${428 - (i - 12) * 31}K`,
+        volume: `$${91 - (i - 12) * 6}K`,
+        change: 182 - (i - 12) * 23,
+        holders: 1829 + (i - 12) * 217,
+        address: `0x${(i + 1).toString(16).padStart(4, "0")}...b0rn`,
+      }
+    : {}),
+}));
+export const liveMemes = memes.filter((m) => m.status === "LIVE");
+export const bornMemes = memes.filter((m) => m.status === "BORN");

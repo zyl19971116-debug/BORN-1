@@ -179,7 +179,7 @@ export default function Create() {
           <div className="flex items-center justify-between border-b border-white/10 px-6 py-5">
             <div>
               <h2 className="text-xl font-black">
-                CREATE TOKEN{" "}
+                MEME//BORN · CREATE TOKEN{" "}
                 <span className="ml-2 rounded-full bg-[#78f2a4] px-2 py-1 text-[10px] text-black">
                   0% PLATFORM FEE
                 </span>
@@ -195,8 +195,8 @@ export default function Create() {
           <div className="space-y-6 p-6">
             <div className="rounded-xl border border-white/10 bg-white/[.025] p-4">
               <div className="flex items-center justify-between">
-                <b className="text-sm">ROBINHOOD MAINNET LAUNCH</b>
-                <span className="lime text-xs">LIVE ↗</span>
+                <b className="text-sm text-[#78f2a4]">LATEST FEATURE UPDATE</b>
+                <span className="lime text-xs">VIEW DOCS ↗</span>
               </div>
               <p className="mt-2 truncate text-xs text-white/45">
                 One wallet confirmation creates your ERC-20 token directly
@@ -205,7 +205,10 @@ export default function Create() {
             </div>
             <div>
               <div className="mb-3 text-xs font-bold text-white/55">
-                CHOOSE TOKEN IMAGE
+                CHOOSE IMAGE{" "}
+                <span className="font-normal text-white/35">
+                  · drag, upload or paste
+                </span>
               </div>
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
                 <button
@@ -233,7 +236,7 @@ export default function Create() {
                   className="aspect-square rounded-xl border border-white/10 bg-white/[.025] text-xs text-white/45"
                 >
                   <ImagePlus className="mx-auto mb-2" size={21} />
-                  LIBRARY
+                  IMAGE LIBRARY
                 </button>
                 <button
                   type="button"
@@ -258,7 +261,7 @@ export default function Create() {
               />
               <input
                 className="pl-11"
-                placeholder="Search existing token names before launching"
+                placeholder="Search a token or paste an image URL"
               />
             </label>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -330,9 +333,9 @@ export default function Create() {
                   </span>
                 </div>
                 <div className="rounded-xl border border-white/10 bg-white/[.025] p-4 text-center">
-                  <b>ONCHAIN DATA</b>
+                  <b className="text-white/35">POOLS</b>
                   <span className="mt-1 block text-[10px] text-white/40">
-                    PERMANENT RECORD
+                    COMING SOON
                   </span>
                 </div>
               </div>

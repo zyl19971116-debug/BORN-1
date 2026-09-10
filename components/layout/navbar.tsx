@@ -1,9 +1,13 @@
 "use client";
+import { useEffect } from "react";
 import Link from "next/link";
 import { useAppStore } from "@/store/use-app-store";
 import { Globe2 } from "lucide-react";
 export function Navbar() {
-  const { address, setWalletOpen } = useAppStore();
+  const { address, setWalletOpen, restoreWallet } = useAppStore();
+  useEffect(() => {
+    restoreWallet();
+  }, [restoreWallet]);
   return (
     <header className="sticky top-0 z-40 border-b border-white/[.07] bg-[#060807]/90 backdrop-blur-xl">
       <div className="container flex h-[72px] items-center justify-between">
@@ -35,7 +39,9 @@ export function Navbar() {
             className="btn btn-primary h-10 py-0 text-[11px]"
             onClick={() => setWalletOpen(true)}
           >
-            {address || "CONNECT WALLET"}
+            {address
+              ? `${address.slice(0, 6)}...${address.slice(-4)}`
+              : "CONNECT WALLET"}
           </button>
         </div>
       </div>

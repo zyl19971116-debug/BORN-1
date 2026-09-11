@@ -89,22 +89,56 @@ export default function Create() {
       .catch(() => setLaunchCount(null));
   }, []);
 
-  function selectImage(file?: File) {
+  async function optimizeImage(file: File) {
+    const bitmap = await createImageBitmap(file);
+    const sizes = [256, 224, 192, 160, 128];
+    const qualities = [0.72, 0.58, 0.46, 0.36, 0.28];
+    let smallest = "";
+    for (const size of sizes) {
+      const scale = Math.min(1, size / Math.max(bitmap.width, bitmap.height));
+      const width = Math.max(1, Math.round(bitmap.width * scale));
+      const height = Math.max(1, Math.round(bitmap.height * scale));
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext("2d")?.drawImage(bitmap, 0, 0, width, height);
+      for (const quality of qualities) {
+        const candidate = canvas.toDataURL("image/webp", quality);
+        smallest = candidate;
+        if (candidate.length <= 10 * 1024) {
+          bitmap.close();
+          return candidate;
+        }
+      }
+    }
+    bitmap.close();
+    if (smallest.length <= 12 * 1024) return smallest;
+    throw new Error("The image could not be optimized for an onchain launch.");
+  }
+
+  async function selectImage(file?: File) {
     if (!file) return;
-    if (file.size > 150_000) {
-      setStatus(
-        "Please choose an image smaller than 150 KB to keep the onchain launch fee reasonable."
-      );
+    if (file.size > 5_000_000) {
+      setStatus("Please choose an image smaller than 5 MB.");
       return;
     }
-    if (preview) URL.revokeObjectURL(preview);
-    setPreview(URL.createObjectURL(file));
-    const reader = new FileReader();
-    reader.onload = () => setImageData(String(reader.result));
-    reader.readAsDataURL(file);
-    setStatus(
-      "Image selected. Token metadata will be generated automatically."
-    );
+    setStatus("Optimizing image for an onchain launch…");
+    try {
+      const optimized = await optimizeImage(file);
+      setPreview(optimized);
+      setImageData(optimized);
+      setStatus(
+        `Image optimized successfully (${(optimized.length / 1024).toFixed(
+          1
+        )} KB onchain payload).`
+      );
+    } catch (error) {
+      setPreview("");
+      setImageData("");
+      setStatus(
+        error instanceof Error ? error.message : "Unable to process this image."
+      );
+    }
   }
 
   async function submit(e: React.FormEvent) {
@@ -290,11 +324,11 @@ export default function Create() {
                 type="file"
                 accept="image/png,image/jpeg,image/webp,image/gif"
                 className="hidden"
-                onChange={(e) => selectImage(e.target.files?.[0])}
+                onChange={(e) => void selectImage(e.target.files?.[0])}
               />
               <p className="mt-3 text-[10px] leading-5 text-white/35">
-                IMAGE REQUIREMENTS · PNG, JPG, WEBP OR GIF · MAX 150 KB ·
-                SQUARE 1:1 RECOMMENDED
+                IMAGE REQUIREMENTS · PNG, JPG, WEBP OR GIF · SOURCE MAX 5 MB ·
+                SQUARE 1:1 RECOMMENDED · AUTOMATICALLY OPTIMIZED FOR ONCHAIN STORAGE
               </p>
             </div>
             <label className="relative block">

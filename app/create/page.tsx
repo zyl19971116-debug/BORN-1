@@ -342,21 +342,6 @@ export default function Create() {
                 </span>
               </div>
             </div>
-            <div>
-              <div className="mb-3 text-xs font-bold text-white/55">
-                LAUNCH PRESET
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-xl border border-white/10 bg-white/[.025] p-4">
-                  <span className="text-[10px] text-white/35">NETWORK</span>
-                  <b className="mt-1 block">Robinhood · 4663</b>
-                </div>
-                <div className="rounded-xl border border-white/10 bg-white/[.025] p-4">
-                  <span className="text-[10px] text-white/35">SUPPLY</span>
-                  <b className="mt-1 block">1,000,000,000</b>
-                </div>
-              </div>
-            </div>
             <label className="block text-xs font-bold text-white/55">
               INITIAL LIQUIDITY
               <span className="float-right font-normal text-white/35">

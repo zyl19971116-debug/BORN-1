@@ -32,6 +32,20 @@ export default function Home() {
               ◉ &nbsp; HOW IT WORKS
             </Link>
           </div>
+          <a
+            href="https://robinhoodchain.blockscout.com/token/0x0a6bdff1fe8ad04c9259d1deccbf8afa5497acef"
+            target="_blank"
+            rel="noreferrer"
+            className="mt-5 inline-flex max-w-full items-center gap-3 rounded-xl border border-[#78f2a4]/25 bg-[#78f2a4]/[.06] px-4 py-3 transition hover:border-[#78f2a4]/50 hover:bg-[#78f2a4]/10"
+          >
+            <span className="shrink-0 text-[9px] font-black tracking-[.16em] text-[#78f2a4]">
+              OFFICIAL CA
+            </span>
+            <code className="truncate text-[10px] text-white/70 sm:text-xs">
+              0x0a6bdff1fe8ad04c9259d1deccbf8afa5497acef
+            </code>
+            <span className="shrink-0 text-xs text-white/45">↗</span>
+          </a>
           <HomeOnchainStats />
         </div>
         <div className="relative h-[430px] self-stretch lg:h-full">

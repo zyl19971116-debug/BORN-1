@@ -175,14 +175,22 @@ export function HomeLatestLaunches() {
   }
   if (!latest.length) {
     return (
-      <div className="mt-5 border-t border-white/[.06] py-10 text-center">
-        <b className="text-xs">NO TOKENS CREATED YET</b>
-        <p className="mt-2 text-[11px] text-white/35">
-          The first confirmed Pools launch will appear here.
-        </p>
-        <Link href="/create" className="btn btn-primary mt-4 px-4 py-2 text-[10px]">
-          CREATE THE FIRST TOKEN
-        </Link>
+      <div className="mt-5 grid grid-cols-2 gap-3 border-t border-white/[.06] pt-5 sm:grid-cols-4">
+        <div className="overflow-hidden rounded-xl border border-[#78f2a4]/25 bg-black/30 p-2">
+          <div
+            className="relative aspect-square rounded-lg bg-cover bg-center"
+            style={{ backgroundImage: "url(/hero-egg.png)" }}
+          >
+            <span className="absolute left-2 top-2 rounded-full border border-[#78f2a4]/30 bg-black/75 px-2 py-1 text-[8px] font-black tracking-wider text-[#78f2a4]">
+              DEMO
+            </span>
+          </div>
+          <b className="mt-2 block truncate text-xs">Born Genesis</b>
+          <span className="text-[9px] text-white/40">$BORNX · DEMO TOKEN</span>
+          <div className="mt-2 rounded border border-white/10 py-1 text-center text-[9px] text-white/45">
+            PREVIEW ONLY
+          </div>
+        </div>
       </div>
     );
   }

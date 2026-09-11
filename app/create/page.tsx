@@ -10,8 +10,12 @@ import {
   Upload,
   X,
 } from "lucide-react";
-import { createWalletClient, custom, parseEther } from "viem";
+import { createWalletClient, custom, formatEther, parseEther } from "viem";
 import { robinhood, robinhoodClient } from "@/lib/robinhood";
+import {
+  ensureRobinhoodNetwork,
+  useAppStore,
+} from "@/store/use-app-store";
 
 const factoryAbi = [
   {
@@ -42,6 +46,8 @@ declare global {
 }
 
 export default function Create() {
+  const { address, walletProvider, walletIdentity, setWalletOpen } =
+    useAppStore();
   const [name, setName] = useState("");
   const [ticker, setTicker] = useState("");
   const [imageData, setImageData] = useState("");
@@ -103,6 +109,20 @@ export default function Create() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    setStatus("Preparing your pool launch…");
+    if (name.trim().length < 2)
+      return setStatus("Enter a token name with at least 2 characters.");
+    if (ticker.trim().length < 2)
+      return setStatus("Enter a token symbol with at least 2 characters.");
+    if (!imageData) return setStatus("Choose a token image before launching.");
+    let seedLiquidity: bigint;
+    try {
+      seedLiquidity = parseEther(initialEth);
+    } catch {
+      return setStatus("Enter a valid initial liquidity amount.");
+    }
+    if (seedLiquidity < parseEther("0.001"))
+      return setStatus("Initial liquidity must be at least 0.001 ETH.");
     const factory = process.env.NEXT_PUBLIC_POOL_FACTORY_ADDRESS as
       | `0x${string}`
       | undefined;
@@ -110,45 +130,37 @@ export default function Create() {
       return setStatus(
         "The Robinhood Pools factory has not been deployed/configured yet."
       );
-    if (!window.ethereum)
+    if (!walletProvider || !address) {
+      setStatus("Connect a wallet before launching your token.");
+      setWalletOpen(true);
+      return;
+    }
+    let walletBalance: bigint;
+    try {
+      walletBalance = await robinhoodClient.getBalance({
+        address: address as `0x${string}`,
+      });
+    } catch {
       return setStatus(
-        "Install an EVM browser wallet such as MetaMask, then connect it."
+        "Unable to read your Robinhood Chain balance. Check your connection and try again."
       );
-    if (!imageData) return setStatus("Choose a token image before launching.");
+    }
+    if (walletBalance <= seedLiquidity) {
+      return setStatus(
+        `Insufficient balance. This launch requires ${initialEth} ETH plus Robinhood Chain gas. Your wallet balance is ${Number(
+          formatEther(walletBalance)
+        ).toFixed(6)} ETH.`
+      );
+    }
     setBusy(true);
     setHash("");
     try {
-      const accounts = (await window.ethereum.request({
-        method: "eth_requestAccounts",
-      })) as `0x${string}`[];
-      try {
-        await window.ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: "0x1237" }],
-        });
-      } catch {
-        await window.ethereum.request({
-          method: "wallet_addEthereumChain",
-          params: [
-            {
-              chainId: "0x1237",
-              chainName: "Robinhood Chain",
-              nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-              rpcUrls: ["https://rpc.mainnet.chain.robinhood.com"],
-              blockExplorerUrls: ["https://robinhoodchain.blockscout.com"],
-            },
-          ],
-        });
-      }
-      const seedLiquidity = parseEther(initialEth);
-      if (seedLiquidity < parseEther("0.001")) {
-        throw new Error("Initial liquidity must be at least 0.001 ETH.");
-      }
+      await ensureRobinhoodNetwork(walletProvider);
       setStatus("Confirm the token and liquidity pool launch in your wallet…");
       const client = createWalletClient({
-        account: accounts[0],
+        account: address as `0x${string}`,
         chain: robinhood,
-        transport: custom(window.ethereum),
+        transport: custom(walletProvider),
       });
       const metadata = `data:application/json,${encodeURIComponent(
         JSON.stringify({
@@ -185,7 +197,7 @@ export default function Create() {
   return (
     <section className="container py-10">
       <div className="mx-auto max-w-2xl">
-        <form onSubmit={submit} className="card overflow-hidden">
+        <form onSubmit={submit} noValidate className="card overflow-hidden">
           <div className="flex items-center justify-between border-b border-white/10 px-6 py-5">
             <div>
               <h2 className="text-xl font-black">
@@ -368,6 +380,7 @@ export default function Create() {
               </span>
             </label>
             <button
+              type="submit"
               disabled={busy}
               className="btn btn-primary h-14 w-full text-sm"
             >
@@ -378,12 +391,35 @@ export default function Create() {
                 </>
               ) : (
                 <>
-                  CREATE TOKEN &amp; POOL <Rocket size={17} />
+                  {address && walletProvider
+                    ? "CREATE TOKEN & POOL"
+                    : "CONNECT WALLET TO LAUNCH"}{" "}
+                  <Rocket size={17} />
                 </>
               )}
             </button>
+            {address && walletProvider && (
+              <button
+                type="button"
+                onClick={() => setWalletOpen(true)}
+                className="mx-auto flex items-center gap-2 text-[10px] text-white/40 transition hover:text-white/70"
+              >
+                {walletIdentity?.icon && (
+                  <img
+                    src={walletIdentity.icon}
+                    alt=""
+                    className="h-4 w-4 rounded object-contain"
+                  />
+                )}
+                {walletIdentity?.name || "Wallet"} · {address.slice(0, 6)}…
+                {address.slice(-4)}
+              </button>
+            )}
             {status && (
-              <div className="relative rounded-xl border border-white/10 bg-white/[.035] p-4 pr-10 text-xs text-white/65">
+              <div
+                aria-live="polite"
+                className="relative rounded-xl border border-white/10 bg-white/[.035] p-4 pr-10 text-xs text-white/65"
+              >
                 <button
                   type="button"
                   onClick={() => setStatus("")}

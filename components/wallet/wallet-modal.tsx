@@ -31,6 +31,16 @@ type LegacyProvider = Eip1193Provider & {
   isCoinbaseWallet?: boolean;
 };
 
+const METAMASK_X_AVATAR =
+  "https://pbs.twimg.com/profile_images/2079082606717779969/DcvmQxfE_400x400.jpg";
+
+function withOfficialWalletArtwork<T extends WalletIdentity>(identity: T): T {
+  const isMetaMask =
+    identity.rdns?.toLowerCase() === "io.metamask" ||
+    identity.name.toLowerCase().includes("metamask");
+  return (isMetaMask ? { ...identity, icon: METAMASK_X_AVATAR } : identity) as T;
+}
+
 function legacyIdentity(provider: LegacyProvider, index: number) {
   if (provider.isRabby)
     return { name: "Rabby Wallet", rdns: "io.rabby", icon: "/wallets/rabby.svg" };
@@ -44,7 +54,7 @@ function legacyIdentity(provider: LegacyProvider, index: number) {
     return {
       name: "MetaMask",
       rdns: "io.metamask",
-      icon: "/wallets/metamask.svg",
+      icon: METAMASK_X_AVATAR,
     };
   return { name: `Browser Wallet ${index + 1}`, rdns: `legacy.${index}` };
 }
@@ -89,8 +99,9 @@ export function WalletModal() {
     function announce(event: Event) {
       const detail = (event as CustomEvent<WalletOption>).detail;
       if (!detail?.provider || !detail.info) return;
-      const key = detail.info.rdns || detail.info.uuid;
-      discovered.set(key, detail);
+      const info = withOfficialWalletArtwork(detail.info);
+      const key = info.rdns || info.uuid;
+      discovered.set(key, { ...detail, info });
       publish();
     }
     window.addEventListener("eip6963:announceProvider", announce);

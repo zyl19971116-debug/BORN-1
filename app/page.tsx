@@ -1,7 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { SiteMarketLeaders } from "@/components/market/site-market-leaders";
-import { bornMemes } from "@/data/memes";
+import {
+  HomeLatestLaunches,
+  HomeOnchainStats,
+} from "@/components/market/home-onchain-launches";
 export default function Home() {
   return (
     <div className="container">
@@ -29,26 +32,7 @@ export default function Home() {
               ◉ &nbsp; HOW IT WORKS
             </Link>
           </div>
-          <div className="mt-10 grid max-w-2xl grid-cols-2 gap-y-6 sm:grid-cols-4">
-            {[
-              ["12,482", "MEMES"],
-              ["1,203", "TOKENS BORN"],
-              ["428,913", "TOTAL HOLDERS"],
-              ["∞", "BETTER MEMES"],
-            ].map((x, i) => (
-              <div
-                className={`pr-6 ${
-                  i ? "sm:border-l sm:border-white/10 sm:pl-6" : ""
-                }`}
-                key={x[1]}
-              >
-                <b className="text-lg">{x[0]}</b>
-                <span className="mt-1 block text-[9px] tracking-wider text-white/40">
-                  {x[1]}
-                </span>
-              </div>
-            ))}
-          </div>
+          <HomeOnchainStats />
         </div>
         <div className="relative h-[430px] self-stretch lg:h-full">
           <div className="absolute inset-16 rounded-full bg-blue-500/10 blur-3xl" />
@@ -80,31 +64,7 @@ export default function Home() {
               VIEW ALL →
             </Link>
           </div>
-          <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {bornMemes.slice(0, 4).map((m) => (
-              <Link
-                href={`/meme/${m.id}`}
-                className="overflow-hidden rounded-xl border border-white/10 bg-black/30 p-2"
-                key={m.id}
-              >
-                <div
-                  className="aspect-square rounded-lg bg-cover"
-                  style={{
-                    backgroundImage: `url(${m.image})`,
-                    backgroundPosition: m.imagePosition,
-                    backgroundSize: "300% 300%",
-                  }}
-                />
-                <b className="mt-2 block text-xs">{m.name}</b>
-                <span className="text-[9px] text-white/40">
-                  ${m.ticker} · {m.bornAgo}
-                </span>
-                <div className="mt-2 rounded border border-white/10 py-1 text-center text-[9px]">
-                  TRADE ↗
-                </div>
-              </Link>
-            ))}
-          </div>
+          <HomeLatestLaunches />
         </div>
         <SiteMarketLeaders />
       </section>

@@ -10,20 +10,24 @@ import {
   Upload,
   X,
 } from "lucide-react";
-import { createWalletClient, custom } from "viem";
+import { createWalletClient, custom, parseEther } from "viem";
 import { robinhood, robinhoodClient } from "@/lib/robinhood";
 
 const factoryAbi = [
   {
     type: "function",
-    name: "createToken",
-    stateMutability: "nonpayable",
+    name: "createTokenAndPool",
+    stateMutability: "payable",
     inputs: [
       { name: "name", type: "string" },
       { name: "ticker", type: "string" },
       { name: "metadataURI", type: "string" },
     ],
-    outputs: [{ type: "address" }],
+    outputs: [
+      { type: "address" },
+      { type: "address" },
+      { type: "uint256" },
+    ],
   },
 ] as const;
 declare global {
@@ -43,6 +47,7 @@ export default function Create() {
   const [imageData, setImageData] = useState("");
   const [website, setWebsite] = useState("");
   const [xUrl, setXUrl] = useState("");
+  const [initialEth, setInitialEth] = useState("0.005");
   const [preview, setPreview] = useState("");
   const [status, setStatus] = useState("");
   const [hash, setHash] = useState("");
@@ -56,7 +61,7 @@ export default function Create() {
     [preview]
   );
   useEffect(() => {
-    const factory = process.env.NEXT_PUBLIC_COMMUNITY_FACTORY_ADDRESS as
+    const factory = process.env.NEXT_PUBLIC_POOL_FACTORY_ADDRESS as
       | `0x${string}`
       | undefined;
     if (!factory) return;
@@ -98,12 +103,12 @@ export default function Create() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    const factory = process.env.NEXT_PUBLIC_COMMUNITY_FACTORY_ADDRESS as
+    const factory = process.env.NEXT_PUBLIC_POOL_FACTORY_ADDRESS as
       | `0x${string}`
       | undefined;
     if (!factory)
       return setStatus(
-        "The Robinhood factory contract has not been deployed/configured yet."
+        "The Robinhood Pools factory has not been deployed/configured yet."
       );
     if (!window.ethereum)
       return setStatus(
@@ -135,7 +140,11 @@ export default function Create() {
           ],
         });
       }
-      setStatus("Confirm the token deployment in your wallet…");
+      const seedLiquidity = parseEther(initialEth);
+      if (seedLiquidity < parseEther("0.001")) {
+        throw new Error("Initial liquidity must be at least 0.001 ETH.");
+      }
+      setStatus("Confirm the token and liquidity pool launch in your wallet…");
       const client = createWalletClient({
         account: accounts[0],
         chain: robinhood,
@@ -154,8 +163,9 @@ export default function Create() {
       const tx = await client.writeContract({
         address: factory,
         abi: factoryAbi,
-        functionName: "createToken",
+        functionName: "createTokenAndPool",
         args: [name.trim(), ticker.trim().toUpperCase(), metadata],
+        value: seedLiquidity,
       });
       setHash(tx);
       setStatus(
@@ -163,7 +173,7 @@ export default function Create() {
       );
       await robinhoodClient.waitForTransactionReceipt({ hash: tx });
       setStatus(
-        "Token created and confirmed. It will appear in Explore automatically."
+        "Token and permanently locked ETH pool created. It will appear in Explore automatically."
       );
     } catch (err) {
       setStatus(err instanceof Error ? err.message : "Transaction cancelled");
@@ -199,8 +209,8 @@ export default function Create() {
                 <span className="lime text-xs">VIEW DOCS ↗</span>
               </div>
               <p className="mt-2 truncate text-xs text-white/45">
-                One wallet confirmation creates your ERC-20 token directly
-                through the MEME//BORN factory.
+                One wallet confirmation creates your token and a permanently
+                locked ETH liquidity pool.
               </p>
             </div>
             <div>
@@ -325,19 +335,11 @@ export default function Create() {
                 <span>PLATFORM</span>
                 <span className="lime">⚡ ROBINHOOD</span>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-xl border border-[#78f2a4] bg-[#78f2a4]/10 p-4 text-center">
-                  <b className="lime">DIRECT ERC-20</b>
-                  <span className="mt-1 block text-[10px] text-white/40">
-                    FACTORY LAUNCH
-                  </span>
-                </div>
-                <div className="rounded-xl border border-white/10 bg-white/[.025] p-4 text-center">
-                  <b className="text-white/35">POOLS</b>
-                  <span className="mt-1 block text-[10px] text-white/40">
-                    COMING SOON
-                  </span>
-                </div>
+              <div className="rounded-xl border border-[#78f2a4] bg-[#78f2a4]/10 p-4 text-center">
+                <b className="lime">POOLS</b>
+                <span className="mt-1 block text-[10px] text-white/40">
+                  ETH PAIR · LP PERMANENTLY LOCKED
+                </span>
               </div>
             </div>
             <div>
@@ -355,6 +357,31 @@ export default function Create() {
                 </div>
               </div>
             </div>
+            <label className="block text-xs font-bold text-white/55">
+              INITIAL LIQUIDITY
+              <span className="float-right font-normal text-white/35">
+                MIN 0.001 ETH
+              </span>
+              <div className="relative mt-2">
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  min="0.001"
+                  step="0.001"
+                  value={initialEth}
+                  onChange={(e) => setInitialEth(e.target.value)}
+                  required
+                  className="pr-14"
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-white/40">
+                  ETH
+                </span>
+              </div>
+              <span className="mt-2 block font-normal leading-5 text-white/30">
+                Your ETH and the full token supply seed a Uniswap V3 pool. The
+                LP position cannot be withdrawn after launch.
+              </span>
+            </label>
             <button
               disabled={busy}
               className="btn btn-primary h-14 w-full text-sm"
@@ -366,7 +393,7 @@ export default function Create() {
                 </>
               ) : (
                 <>
-                  CREATE ON ROBINHOOD <Rocket size={17} />
+                  CREATE TOKEN &amp; POOL <Rocket size={17} />
                 </>
               )}
             </button>
@@ -395,9 +422,9 @@ export default function Create() {
           </div>
         </form>
         <p className="mx-auto mt-5 max-w-2xl text-center text-[11px] leading-5 text-white/30">
-          Launching creates an independent ERC-20 contract on Robinhood Chain.
-          It does not list the token in the Robinhood brokerage app or guarantee
-          liquidity, price, or trading availability.
+          Launching creates an ERC-20 token and a permanently locked Uniswap V3
+          pool on Robinhood Chain. It does not list the token in the Robinhood
+          brokerage app or guarantee token value or trading demand.
         </p>
       </div>
     </section>

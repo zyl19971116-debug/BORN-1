@@ -12,6 +12,7 @@
     "deploy:robinhood": "hardhat run scripts/deploy.ts --network robinhood",
     "deploy:community:testnet": "hardhat run scripts/deploy-community.ts --network robinhoodTestnet",
     "deploy:community": "hardhat run scripts/deploy-community.ts --network robinhood",
+    "deploy:pools": "hardhat run scripts/deploy-pool-factory.ts --network robinhood",
     "keeper": "tsx scripts/keeper.ts"
   },
   "dependencies": {

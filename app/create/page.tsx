@@ -91,8 +91,8 @@ export default function Create() {
 
   async function optimizeImage(file: File) {
     const bitmap = await createImageBitmap(file);
-    const sizes = [256, 224, 192, 160, 128];
-    const qualities = [0.72, 0.58, 0.46, 0.36, 0.28];
+    const sizes = [192, 160, 128, 112, 96, 80];
+    const qualities = [0.62, 0.48, 0.36, 0.26, 0.18];
     let smallest = "";
     for (const size of sizes) {
       const scale = Math.min(1, size / Math.max(bitmap.width, bitmap.height));
@@ -105,14 +105,14 @@ export default function Create() {
       for (const quality of qualities) {
         const candidate = canvas.toDataURL("image/webp", quality);
         smallest = candidate;
-        if (candidate.length <= 10 * 1024) {
+        if (candidate.length <= 2 * 1024) {
           bitmap.close();
           return candidate;
         }
       }
     }
     bitmap.close();
-    if (smallest.length <= 12 * 1024) return smallest;
+    if (smallest.length <= 3 * 1024) return smallest;
     throw new Error("The image could not be optimized for an onchain launch.");
   }
 
@@ -328,7 +328,8 @@ export default function Create() {
               />
               <p className="mt-3 text-[10px] leading-5 text-white/35">
                 IMAGE REQUIREMENTS · PNG, JPG, WEBP OR GIF · SOURCE MAX 5 MB ·
-                SQUARE 1:1 RECOMMENDED · AUTOMATICALLY OPTIMIZED FOR ONCHAIN STORAGE
+                SQUARE 1:1 RECOMMENDED · AUTOMATICALLY OPTIMIZED TO ABOUT 2 KB
+                FOR ONCHAIN STORAGE
               </p>
             </div>
             <label className="relative block">

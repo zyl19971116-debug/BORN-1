@@ -135,33 +135,12 @@ export default function Create() {
       setWalletOpen(true);
       return;
     }
-    let walletBalance: bigint;
-    try {
-      walletBalance = await robinhoodClient.getBalance({
-        address: address as `0x${string}`,
-      });
-    } catch {
-      return setStatus(
-        "Unable to read your Robinhood Chain balance. Check your connection and try again."
-      );
-    }
-    if (walletBalance <= seedLiquidity) {
-      return setStatus(
-        `Insufficient balance. This launch requires ${initialEth} ETH plus Robinhood Chain gas. Your wallet balance is ${Number(
-          formatEther(walletBalance)
-        ).toFixed(6)} ETH.`
-      );
-    }
     setBusy(true);
     setHash("");
     try {
       await ensureRobinhoodNetwork(walletProvider);
-      setStatus("Confirm the token and liquidity pool launch in your wallet…");
-      const client = createWalletClient({
-        account: address as `0x${string}`,
-        chain: robinhood,
-        transport: custom(walletProvider),
-      });
+      const account = address as `0x${string}`;
+      const walletBalance = await robinhoodClient.getBalance({ address: account });
       const metadata = `data:application/json,${encodeURIComponent(
         JSON.stringify({
           name: name.trim(),
@@ -172,11 +151,49 @@ export default function Create() {
           twitter: xUrl.trim() || undefined,
         })
       )}`;
+      const args = [
+        name.trim(),
+        ticker.trim().toUpperCase(),
+        metadata,
+      ] as const;
+
+      setStatus("Checking balance and simulating the complete pool launch…");
+      const [estimatedGas, gasPrice] = await Promise.all([
+        robinhoodClient.estimateContractGas({
+          address: factory,
+          abi: factoryAbi,
+          functionName: "createTokenAndPool",
+          args,
+          account,
+          value: seedLiquidity,
+          stateOverride: [
+            { address: account, balance: seedLiquidity + parseEther("1") },
+          ],
+        }),
+        robinhoodClient.getGasPrice(),
+      ]);
+      const requiredBalance = seedLiquidity + (estimatedGas * gasPrice * 12n) / 10n;
+      if (walletBalance < requiredBalance) {
+        throw new Error(
+          `Insufficient Robinhood Chain ETH. Required approximately ${Number(
+            formatEther(requiredBalance)
+          ).toFixed(6)} ETH including gas; wallet balance is ${Number(
+            formatEther(walletBalance)
+          ).toFixed(6)} ETH.`
+        );
+      }
+
+      setStatus("Simulation passed. Confirm the real mainnet launch in your wallet…");
+      const client = createWalletClient({
+        account,
+        chain: robinhood,
+        transport: custom(walletProvider),
+      });
       const tx = await client.writeContract({
         address: factory,
         abi: factoryAbi,
         functionName: "createTokenAndPool",
-        args: [name.trim(), ticker.trim().toUpperCase(), metadata],
+        args,
         value: seedLiquidity,
       });
       setHash(tx);
@@ -275,6 +292,10 @@ export default function Create() {
                 className="hidden"
                 onChange={(e) => selectImage(e.target.files?.[0])}
               />
+              <p className="mt-3 text-[10px] leading-5 text-white/35">
+                IMAGE REQUIREMENTS · PNG, JPG, WEBP OR GIF · MAX 150 KB ·
+                SQUARE 1:1 RECOMMENDED
+              </p>
             </div>
             <label className="relative block">
               <Search

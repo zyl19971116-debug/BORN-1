@@ -213,6 +213,9 @@ export function HomeLatestLaunches() {
             <span className="text-[9px] text-white/40">
               ${launch.ticker} · {age(launch.createdAt)}
             </span>
+            <span className="mt-1 block truncate font-mono text-[8px] text-[#78f2a4]/65">
+              CA · {launch.token}
+            </span>
             <div className="mt-2 rounded border border-white/10 py-1 text-center text-[9px]">
               VIEW ONCHAIN ↗
             </div>

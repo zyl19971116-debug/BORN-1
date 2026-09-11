@@ -31,6 +31,9 @@ const factoryAbi = [
         components: [
           { name: "token", type: "address" },
           { name: "creator", type: "address" },
+          { name: "pool", type: "address" },
+          { name: "positionTokenId", type: "uint256" },
+          { name: "initialEth", type: "uint256" },
           { name: "name", type: "string" },
           { name: "ticker", type: "string" },
           { name: "metadataURI", type: "string" },
@@ -74,7 +77,7 @@ export function OnchainLaunchList() {
   const [sort, setSort] = useState<"newest" | "market">("newest");
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
   useEffect(() => {
-    const factory = process.env.NEXT_PUBLIC_COMMUNITY_FACTORY_ADDRESS as
+    const factory = process.env.NEXT_PUBLIC_POOL_FACTORY_ADDRESS as
       | `0x${string}`
       | undefined;
     const oracle = process.env.NEXT_PUBLIC_DAILY_ORACLE_ADDRESS as
@@ -188,6 +191,14 @@ export function OnchainLaunchList() {
                 />
                 <h3 className="mt-4 truncate font-bold">{token.name}</h3>
                 <p className="text-xs text-white/40">${token.ticker}</p>
+                <a
+                  href={`https://robinhoodchain.blockscout.com/token/${token.token}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-2 block truncate font-mono text-[9px] text-[#78f2a4]/65 hover:text-[#78f2a4]"
+                >
+                  CA · {token.token}
+                </a>
                 <div className="mt-4 border-t border-white/10 pt-4 text-xs">
                   <span className="muted">MARKET CAP</span>
                   <b className="mt-1 block">{money(token.cap)}</b>

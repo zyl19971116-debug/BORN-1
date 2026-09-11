@@ -28,6 +28,9 @@ const factoryAbi = [
         components: [
           { name: "token", type: "address" },
           { name: "creator", type: "address" },
+          { name: "pool", type: "address" },
+          { name: "positionTokenId", type: "uint256" },
+          { name: "initialEth", type: "uint256" },
           { name: "name", type: "string" },
           { name: "ticker", type: "string" },
           { name: "metadataURI", type: "string" },
@@ -58,7 +61,7 @@ export function SiteMarketLeaders() {
   const [leaders, setLeaders] = useState<Leader[]>([]),
     [live, setLive] = useState(false);
   useEffect(() => {
-    const factory = process.env.NEXT_PUBLIC_COMMUNITY_FACTORY_ADDRESS as
+    const factory = process.env.NEXT_PUBLIC_POOL_FACTORY_ADDRESS as
         | `0x${string}`
         | undefined,
       oracle = process.env.NEXT_PUBLIC_DAILY_ORACLE_ADDRESS as

@@ -10,7 +10,13 @@ import {
   Upload,
   X,
 } from "lucide-react";
-import { createWalletClient, custom, formatEther, parseEther } from "viem";
+import {
+  createWalletClient,
+  custom,
+  formatEther,
+  parseEther,
+  parseEventLogs,
+} from "viem";
 import { robinhood, robinhoodClient } from "@/lib/robinhood";
 import {
   ensureRobinhoodNetwork,
@@ -31,6 +37,18 @@ const factoryAbi = [
       { type: "address" },
       { type: "address" },
       { type: "uint256" },
+    ],
+  },
+  {
+    type: "event",
+    name: "PoolTokenCreated",
+    inputs: [
+      { name: "launchId", type: "uint256", indexed: true },
+      { name: "token", type: "address", indexed: true },
+      { name: "creator", type: "address", indexed: true },
+      { name: "pool", type: "address", indexed: false },
+      { name: "positionTokenId", type: "uint256", indexed: false },
+      { name: "initialEth", type: "uint256", indexed: false },
     ],
   },
 ] as const;
@@ -57,6 +75,7 @@ export default function Create() {
   const [preview, setPreview] = useState("");
   const [status, setStatus] = useState("");
   const [hash, setHash] = useState("");
+  const [createdToken, setCreatedToken] = useState("");
   const [busy, setBusy] = useState(false);
   const [launchCount, setLaunchCount] = useState<bigint | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -171,6 +190,7 @@ export default function Create() {
     }
     setBusy(true);
     setHash("");
+    setCreatedToken("");
     try {
       await ensureRobinhoodNetwork(walletProvider);
       const account = address as `0x${string}`;
@@ -234,9 +254,15 @@ export default function Create() {
       setStatus(
         "Transaction submitted. Waiting for Robinhood Chain confirmation…"
       );
-      await robinhoodClient.waitForTransactionReceipt({ hash: tx });
+      const receipt = await robinhoodClient.waitForTransactionReceipt({ hash: tx });
+      const created = parseEventLogs({
+        abi: factoryAbi,
+        eventName: "PoolTokenCreated",
+        logs: receipt.logs,
+      })[0];
+      if (created) setCreatedToken(created.args.token);
       setStatus(
-        "Token and permanently locked ETH pool created. It will appear in Explore automatically."
+        "Token and permanently locked ETH pool created. Its CA is now recorded on MEME//BORN."
       );
     } catch (err) {
       setStatus(err instanceof Error ? err.message : "Transaction cancelled");
@@ -493,6 +519,21 @@ export default function Create() {
                   >
                     VIEW TRANSACTION ↗
                   </a>
+                )}
+                {createdToken && (
+                  <div className="mt-3 border-t border-white/10 pt-3">
+                    <span className="block text-[9px] font-black tracking-wider text-[#78f2a4]">
+                      TOKEN CA
+                    </span>
+                    <a
+                      className="mt-1 block break-all font-mono text-white/80 hover:text-[#78f2a4]"
+                      href={`https://robinhoodchain.blockscout.com/token/${createdToken}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {createdToken} ↗
+                    </a>
+                  </div>
                 )}
               </div>
             )}
